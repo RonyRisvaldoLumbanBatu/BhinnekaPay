@@ -27,4 +27,4 @@ Proyek ini bertujuan menciptakan sistem pembayaran tertutup (closed-loop) menggu
    - `python main.py`
 
 ---
-*Created by [Nama Kamu] for University Project.*
+*Created by Rony Risvaldo for University Project.*
