@@ -70,13 +70,15 @@ class _SplitBillListPageState extends State<SplitBillListPage> {
                   children: [
                     Expanded(
                       child: TextField(
-                        onChanged: (value) => _runFilter(value), // Panggil fungsi filter
+                        onChanged: (value) =>
+                            _runFilter(value), // Panggil fungsi filter
                         decoration: InputDecoration(
                           hintText: "Cari Nama...",
                           prefixIcon: const Icon(Icons.search),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8)),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 0),
                         ),
                       ),
                     ),
@@ -86,7 +88,9 @@ class _SplitBillListPageState extends State<SplitBillListPage> {
                         // Navigasi ke Halaman Buat Bill Baru
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const CreateSplitBillPage()),
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const CreateSplitBillPage()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -96,9 +100,9 @@ class _SplitBillListPageState extends State<SplitBillListPage> {
                     )
                   ],
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Header Tabel
                 _buildHeaderRow(),
                 const Divider(thickness: 2, color: Color(0xFF1A237E)),
@@ -108,7 +112,8 @@ class _SplitBillListPageState extends State<SplitBillListPage> {
                 if (_foundBills.isEmpty)
                   const Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: Text("Data tidak ditemukan", style: TextStyle(color: Colors.grey)),
+                    child: Text("Data tidak ditemukan",
+                        style: TextStyle(color: Colors.grey)),
                   ),
 
                 // Mapping data ke Widget Row
@@ -119,7 +124,7 @@ class _SplitBillListPageState extends State<SplitBillListPage> {
                     bill["status"],
                     bill["btn"],
                   );
-                }).toList(),
+                }),
               ],
             ),
           ),
@@ -133,16 +138,29 @@ class _SplitBillListPageState extends State<SplitBillListPage> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: const [
-          Expanded(flex: 2, child: Text("Name", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A237E)))),
-          Expanded(flex: 2, child: Text("Amount", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A237E)))),
-          Expanded(flex: 1, child: Text("Status", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A237E)))),
+          Expanded(
+              flex: 2,
+              child: Text("Name",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Color(0xFF1A237E)))),
+          Expanded(
+              flex: 2,
+              child: Text("Amount",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Color(0xFF1A237E)))),
+          Expanded(
+              flex: 1,
+              child: Text("Status",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Color(0xFF1A237E)))),
           Expanded(flex: 2, child: SizedBox()),
         ],
       ),
     );
   }
 
-  Widget _buildUserRow(String name, String amount, String status, bool showBtn) {
+  Widget _buildUserRow(
+      String name, String amount, String status, bool showBtn) {
     Color statusColor = status == "Paid" ? Colors.green : Colors.red;
 
     return Container(
@@ -167,21 +185,24 @@ class _SplitBillListPageState extends State<SplitBillListPage> {
               flex: 1,
               child: Text(status,
                   style: TextStyle(
-                      fontWeight: FontWeight.bold, color: statusColor, fontSize: 12))),
+                      fontWeight: FontWeight.bold,
+                      color: statusColor,
+                      fontSize: 12))),
           Expanded(
             flex: 2,
-            child: status == "Unpaid" 
-            ? ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Tagihan dikirim ke $name")));
-              },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1A237E),
-                  padding: const EdgeInsets.symmetric(vertical: 4)),
-              child: const Text("Send Bill",
-                  style: TextStyle(color: Colors.white, fontSize: 10)),
-            )
-            : const SizedBox(), // Jika Paid, tombol hilang
+            child: status == "Unpaid"
+                ? ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Tagihan dikirim ke $name")));
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1A237E),
+                        padding: const EdgeInsets.symmetric(vertical: 4)),
+                    child: const Text("Send Bill",
+                        style: TextStyle(color: Colors.white, fontSize: 10)),
+                  )
+                : const SizedBox(), // Jika Paid, tombol hilang
           ),
         ],
       ),

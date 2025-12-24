@@ -4,7 +4,7 @@ import 'edit_profile_page.dart';
 import 'cicilan_page.dart';
 import 'kas_page.dart';
 import 'notification_page.dart';
-import 'split_bill_list_page.dart'; 
+import 'split_bill_list_page.dart';
 
 class DashboardPage extends StatelessWidget {
   // 1. Variabel untuk nama user (dinamis dari Login)
@@ -41,7 +41,7 @@ class DashboardPage extends StatelessWidget {
             ),
           ],
         ),
-        
+
         // --- BAGIAN 2: ICON & FOTO PROFIL ---
         actions: [
           IconButton(
@@ -49,21 +49,22 @@ class DashboardPage extends StatelessWidget {
               // Navigasi ke Halaman Notifikasi
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const NotificationPage()),
+                MaterialPageRoute(
+                    builder: (context) => const NotificationPage()),
               );
             },
             icon: const Icon(Icons.notifications_outlined, color: Colors.grey),
           ),
-          
+
           // Foto Profil (Klik untuk Edit)
           Padding(
             padding: const EdgeInsets.only(right: 16.0, left: 8.0),
             child: InkWell(
               onTap: () {
                 Navigator.push(
-                  context, 
-                  MaterialPageRoute(builder: (context) => const EditProfilePage())
-                );
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const EditProfilePage()));
               },
               child: Container(
                 width: 40,
@@ -72,7 +73,8 @@ class DashboardPage extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.grey.shade300),
                   image: const DecorationImage(
-                    image: AssetImage('assets/profile_placeholder.png'), // Ganti sesuai asetmu
+                    image: AssetImage(
+                        'assets/profile_placeholder.png'), // Ganti sesuai asetmu
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -93,47 +95,67 @@ class DashboardPage extends StatelessWidget {
               child: Card(
                 elevation: 2,
                 color: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Keuangan & Transaksi", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      const Text("Keuangan & Transaksi",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
                       const Divider(height: 24),
-                      const Text("Rp 5.700.000", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF1A237E))),
-                      const Text("Saldo Aktif", style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      const Text("Rp 5.700.000",
+                          style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1A237E))),
+                      const Text("Saldo Aktif",
+                          style: TextStyle(fontSize: 12, color: Colors.grey)),
                       const SizedBox(height: 24),
-                      
+
                       // Ikon Menu
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.start, // Agar teks sejajar atas
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start, // Agar teks sejajar atas
                         children: [
-                          _buildMenuItem(context, Icons.account_balance_wallet, "Isi Saldo", () {
-                             // --- PERBAIKAN DI SINI: Kirim username ke IsiSaldoPage ---
-                             Navigator.push(
-                               context, 
-                               MaterialPageRoute(builder: (context) => IsiSaldoPage(username: username))
-                             );
-                          }),
-                          _buildMenuItem(context, Icons.receipt_long, "Cicilan", () {
-                             Navigator.push(
-                               context, 
-                               // Kirim username ke CicilanPage
-                               MaterialPageRoute(builder: (context) => CicilanPage(username: username)) 
-                             );
-                          }),
-                          _buildMenuItem(context, Icons.monetization_on, "Bayar Kas", () {
+                          _buildMenuItem(context, Icons.account_balance_wallet,
+                              "Isi Saldo", () {
+                            // --- PERBAIKAN DI SINI: Kirim username ke IsiSaldoPage ---
                             Navigator.push(
-                              context, 
-                              // Kirim username ke KasPage
-                              MaterialPageRoute(builder: (context) => KasPage(username: username)) 
-                            );
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        IsiSaldoPage(username: username)));
+                          }),
+                          _buildMenuItem(context, Icons.receipt_long, "Cicilan",
+                              () {
+                            Navigator.push(
+                                context,
+                                // Kirim username ke CicilanPage
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        CicilanPage(username: username)));
+                          }),
+                          _buildMenuItem(
+                              context, Icons.monetization_on, "Bayar Kas", () {
+                            Navigator.push(
+                                context,
+                                // Kirim username ke KasPage
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        KasPage(username: username)));
                           }),
                           // Menu Split Bill
-                          _buildMenuItem(context, Icons.call_split, "Split Bill", () { 
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => const SplitBillListPage()));
+                          _buildMenuItem(
+                              context, Icons.call_split, "Split Bill", () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SplitBillListPage()));
                           }),
                         ],
                       )
@@ -151,7 +173,8 @@ class DashboardPage extends StatelessWidget {
               child: Card(
                 elevation: 2,
                 color: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -159,16 +182,22 @@ class DashboardPage extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: const [
-                          Text("Ringkasan Bulan Ini", style: TextStyle(fontWeight: FontWeight.bold)),
-                          Icon(Icons.pie_chart_outline, color: Colors.grey, size: 20),
+                          Text("Ringkasan Bulan Ini",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          Icon(Icons.pie_chart_outline,
+                              color: Colors.grey, size: 20),
                         ],
                       ),
                       const SizedBox(height: 16),
                       Row(
                         children: [
-                          Expanded(child: _buildFinanceStat(Icons.arrow_downward, "Pemasukan", "Rp 385.000", Colors.green)),
+                          Expanded(
+                              child: _buildFinanceStat(Icons.arrow_downward,
+                                  "Pemasukan", "Rp 385.000", Colors.green)),
                           const SizedBox(width: 16),
-                          Expanded(child: _buildFinanceStat(Icons.arrow_upward, "Pengeluaran", "Rp 380.000", Colors.red)),
+                          Expanded(
+                              child: _buildFinanceStat(Icons.arrow_upward,
+                                  "Pengeluaran", "Rp 380.000", Colors.red)),
                         ],
                       ),
                     ],
@@ -176,7 +205,7 @@ class DashboardPage extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
 
             // 3. Announcements
@@ -185,29 +214,40 @@ class DashboardPage extends StatelessWidget {
               child: Card(
                 elevation: 2,
                 color: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 child: Column(
-                  children: [ 
+                  children: [
                     const ListTile(
-                      title: Text("Pengumuman", style: TextStyle(fontWeight: FontWeight.bold)),
-                      trailing: Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                      title: Text("Pengumuman",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      trailing: Icon(Icons.arrow_forward_ios,
+                          size: 14, color: Colors.grey),
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.info_outline, color: Colors.blue),
-                      title: Text("Selamat Datang $username!", style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                      subtitle: const Text("Jangan lupa cek tagihan kas mingguan.", style: TextStyle(fontSize: 11)),
+                      leading:
+                          const Icon(Icons.info_outline, color: Colors.blue),
+                      title: Text("Selamat Datang $username!",
+                          style: const TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.bold)),
+                      subtitle: const Text(
+                          "Jangan lupa cek tagihan kas mingguan.",
+                          style: TextStyle(fontSize: 11)),
                     ),
                     const ListTile(
                       leading: Icon(Icons.event_note, color: Colors.orange),
-                      title: Text("Jadwal Ujian Tengah Semester", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                      subtitle: Text("Dimulai tanggal 20 Desember 2025.", style: TextStyle(fontSize: 11)),
+                      title: Text("Jadwal Ujian Tengah Semester",
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.bold)),
+                      subtitle: Text("Dimulai tanggal 20 Desember 2025.",
+                          style: TextStyle(fontSize: 11)),
                     ),
                   ],
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 20),
           ],
         ),
@@ -217,51 +257,55 @@ class DashboardPage extends StatelessWidget {
 
   // --- Widget Helpers ---
 
-  Widget _buildMenuItem(BuildContext context, IconData icon, String label, VoidCallback onTap) {
+  Widget _buildMenuItem(
+      BuildContext context, IconData icon, String label, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       child: Column(
         children: [
           Container(
-             padding: const EdgeInsets.all(12),
-             decoration: BoxDecoration(
-               color: const Color(0xFFE8EAF6), // Biru sangat muda
-               borderRadius: BorderRadius.circular(12),
-             ),
-             child: Icon(icon, color: const Color(0xFF1A237E), size: 28),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8EAF6), // Biru sangat muda
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: const Color(0xFF1A237E), size: 28),
           ),
           const SizedBox(height: 8),
-          Text(
-            label, 
-            textAlign: TextAlign.center, 
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500)
-          ),
+          Text(label,
+              textAlign: TextAlign.center,
+              style:
+                  const TextStyle(fontSize: 11, fontWeight: FontWeight.w500)),
         ],
       ),
     );
   }
 
-  Widget _buildFinanceStat(IconData icon, String label, String amount, Color color) {
+  Widget _buildFinanceStat(
+      IconData icon, String label, String amount, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05), 
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.2))
-      ),
+          color: color.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(6),
-            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            decoration: const BoxDecoration(
+                color: Colors.white, shape: BoxShape.circle),
             child: Icon(icon, color: color, size: 16),
           ),
           const SizedBox(width: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
-              Text(amount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              Text(label,
+                  style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+              Text(amount,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 13)),
             ],
           )
         ],
