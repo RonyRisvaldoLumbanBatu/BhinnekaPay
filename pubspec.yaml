@@ -1,6 +1,6 @@
 name: minibank
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -11,9 +11,12 @@ dependencies:
   flutter:
     sdk: flutter
   image_picker: ^1.0.4
-  
+
   cupertino_icons: ^1.0.8
+  http: ^1.2.6 # Untuk koneksi ke API
   intl: ^0.20.2
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^7.1.4
 
 dev_dependencies:
   flutter_test:
@@ -23,17 +26,17 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  
+
   # BAGIAN INI SUDAH DIPERBAIKI
   assets:
     - assets/
     # Jika Anda menyimpan logo di dalam folder icon, tambahkan juga:
-    - assets/icon/ 
+    - assets/icon/
     - assets/qr_code.png
 
 # Konfigurasi Launcher Icons
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/icon/logo_bank.jpeg" 
+  image_path: "assets/icon/logo_bank.jpeg"
   min_sdk_android: 21

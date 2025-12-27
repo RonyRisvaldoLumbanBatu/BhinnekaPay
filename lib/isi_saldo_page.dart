@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'qr_saldo_page.dart';
+import 'package:intl/intl.dart';
+import 'qr_saldo_page.dart'; // Import Halaman QR
 
 class IsiSaldoPage extends StatefulWidget {
-  final String username; // Variabel username dari Dashboard/MainPage
-  
+  final String username;
   const IsiSaldoPage({super.key, required this.username});
 
   @override
@@ -11,164 +11,283 @@ class IsiSaldoPage extends StatefulWidget {
 }
 
 class _IsiSaldoPageState extends State<IsiSaldoPage> {
-  // Variabel untuk menyimpan input angka mentah (string)
-  String _inputAmount = "";
+  final TextEditingController _amountController = TextEditingController();
+  final _currencyFormatter =
+      NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
-  // Fungsi untuk menangani tekanan tombol keypad
-  void _onKeyTap(String value) {
+  void _updateAmount(int amount) {
     setState(() {
-      if (value == '⌫') {
-        if (_inputAmount.isNotEmpty) {
-          _inputAmount = _inputAmount.substring(0, _inputAmount.length - 1);
-        }
-      } else if (value == '000') {
-        if (_inputAmount.isNotEmpty) {
-          _inputAmount += '000';
-        }
-      } else {
-        if (_inputAmount.isEmpty && value == '0') {
-          return;
-        }
-        if (_inputAmount.length < 12) {
-          _inputAmount += value;
-        }
-      }
+      _amountController.text = amount.toString();
     });
   }
 
-  // Fungsi helper format Rupiah
-  String _getFormattedAmount() {
-    if (_inputAmount.isEmpty) return "Rp0";
-    String price = _inputAmount.replaceAllMapped(
-        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.');
-    return "Rp$price";
+  void _handleTopUp() {
+    String rawAmount = _amountController.text.replaceAll('.', '');
+    int? nominal = int.tryParse(rawAmount);
+
+    if (nominal == null || nominal <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Masukkan nominal yang valid!")),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            QrSaldoPage(nominal: nominal, username: widget.username),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Cek apakah halaman ini bisa di-pop (artinya dibuka dari dashboard/push)
+    bool showBackButton = Navigator.canPop(context);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(""), // Kosongkan judul
-        backgroundColor: Colors.transparent, 
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 500),
-          child: Card(
-            margin: const EdgeInsets.all(16),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("Jumlah Isi Saldo", style: TextStyle(color: Colors.grey)),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    width: double.infinity,
-                    color: Colors.blue[50],
-                    child: Text(
-                      _getFormattedAmount(),
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: Column(
+        children: [
+          // 1. CUSTOM HEADER
+          Container(
+            padding: const EdgeInsets.fromLTRB(
+                20, 50, 20, 25), // Padding atas untuk StatusBar
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1A237E), Color(0xFF283593)], // Gradasi Navy
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black12, blurRadius: 10, offset: Offset(0, 5))
+              ],
+            ),
+            child: Row(
+              children: [
+                // Tombol Back Custom (Kondisional)
+                if (showBackButton)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 15),
+                    child: InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.arrow_back_ios_new,
+                            color: Colors.white, size: 20),
+                      ),
                     ),
                   ),
-                  const Text("Biaya Admin: Rp1.500", style: TextStyle(fontSize: 12, color: Colors.grey)),
-                  const Divider(height: 30),
 
-                  const Center(child: Text("Cara isi Saldo", style: TextStyle(fontWeight: FontWeight.bold))),
+                // Teks Header
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Top Up Saldo",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Isi dana aman lewat Biro Keuangan",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // 2. KONTEN SCROLLABLE
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Mau isi saldo berapa?",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A237E))),
                   const SizedBox(height: 10),
-                  _buildStep("Tentukan jumlah isi saldo"),
-                  _buildStep("Tunjukkan kode bayar ke Admin"),
-                  _buildStep("Saldo akan diterima maks. 24 jam"),
-
-                  const SizedBox(height: 20),
-
-                  // Simple Keypad Layout
                   Container(
-                    color: Colors.grey[100],
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      children: [
-                        _buildKeypadRow(['1', '2', '3']),
-                        _buildKeypadRow(['4', '5', '6']),
-                        _buildKeypadRow(['7', '8', '9']),
-                        _buildKeypadRow(['0', '000', '⌫']),
-                        const SizedBox(height: 10),
-                        
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Validasi: Pastikan tidak kosong dan lebih dari 0
-                              if (_inputAmount.isNotEmpty && int.parse(_inputAmount) > 0) {
-                                
-                                // --- PERBAIKAN DI SINI ---
-                                // Mengirim username ke QrSaldoPage
-                                Navigator.push(
-                                  context, 
-                                  MaterialPageRoute(
-                                    builder: (context) => QrSaldoPage(
-                                      inputNominal: _inputAmount,
-                                      username: widget.username, // <--- PENTING: Kirim username
-                                    )
-                                  )
-                                );
-                                // -------------------------
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey.withOpacity(0.1), blurRadius: 10)
+                      ],
+                      border: Border.all(
+                          color: const Color(0xFF1A237E).withOpacity(0.1)),
+                    ),
+                    child: TextField(
+                      controller: _amountController,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A237E)),
+                      decoration: const InputDecoration(
+                        prefixText: "Rp ",
+                        prefixStyle: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey),
+                        border: InputBorder.none,
+                        hintText: "0",
+                      ),
+                    ),
+                  ),
 
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Masukkan jumlah saldo terlebih dahulu")),
-                                );
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF1A237E), // Navy
-                              foregroundColor: Colors.white
-                            ),
-                            child: const Text("LANJUT"),
+                  const SizedBox(height: 25),
+
+                  // CHIPS
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [50000, 100000, 200000, 500000].map((amount) {
+                      return InkWell(
+                        onTap: () => _updateAmount(amount),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25),
+                            border: Border.all(color: Colors.grey.shade200),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.withOpacity(0.05),
+                                  blurRadius: 5)
+                            ],
                           ),
-                        )
+                          child: Text(
+                            _currencyFormatter
+                                .format(amount)
+                                .replaceAll("Rp ", ""),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1A237E)),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // METODE PEMBAYARAN
+                  const Text("Metode Pembayaran",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A237E))),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: const Color(0xFF1A237E), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                            color: const Color(0xFF1A237E).withOpacity(0.1),
+                            blurRadius: 15)
                       ],
                     ),
-                  )
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1A237E).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.storefront_rounded,
+                              color: Color(0xFF1A237E), size: 30),
+                        ),
+                        const SizedBox(width: 18),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text("Setor Tunai (Biro Keuangan)",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF1A237E))),
+                              SizedBox(height: 4),
+                              Text("Kunjungi loket biro & scan QR.",
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey)),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.check_circle_rounded,
+                            color: Color(0xFF1A237E), size: 28),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 60),
+
+                  // TOMBOL
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: _handleTopUp,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1A237E),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                        elevation: 8,
+                        shadowColor: const Color(0xFF1A237E).withOpacity(0.5),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Text("BUAT KODE SETOR TUNAI",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16)),
+                          SizedBox(width: 12),
+                          Icon(Icons.qr_code_2_rounded, color: Colors.white),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStep(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          const Icon(Icons.check_circle_outline, color: Colors.green),
-          const SizedBox(width: 8),
-          Text(text, style: const TextStyle(fontSize: 12)),
         ],
       ),
-    );
-  }
-
-  Widget _buildKeypadRow(List<String> keys) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: keys.map((key) => TextButton(
-        onPressed: () => _onKeyTap(key),
-        child: Text(
-          key, 
-          style: const TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)
-        ),
-      )).toList(),
     );
   }
 }
