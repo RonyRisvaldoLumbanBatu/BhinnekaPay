@@ -1,0 +1,47 @@
+name: Flutter Android Build
+
+on:
+  push:
+    branches: ["main", "master", "rony"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # 1. Setup Java untuk Android Build
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      # 2. Setup Flutter
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      # 3. Install Dependencies
+      - name: Install Dependencies
+        run: flutter pub get
+
+      # 4. Cek Kualitas Kode (Linting)
+      - name: Analyze Code
+        run: flutter analyze
+
+      # 5. Build APK (Debug Version)
+      # Kita pakai debug dulu karena release butuh KeyStore (tanda tangan digital)
+      - name: Build Android APK
+        run: flutter build apk --debug
+
+      # 6. Upload APK ke GitHub Artifacts
+      # Nanti bisa didownload di menu "Actions" GitHub
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: bhinnekapay-debug
+          path: build/app/outputs/flutter-apk/app-debug.apk

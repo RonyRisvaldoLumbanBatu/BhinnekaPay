@@ -1,0 +1,21 @@
+name: Backend PHP Check
+
+on:
+  push:
+    paths:
+      - "api/**" # Hanya jalan kalau ada perubahan di folder API
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+
+      # Cek Syntax Error di semua file .php
+      - name: Check PHP Syntax
+        run: find api -name "*.php" -print0 | xargs -0 -n1 php -l
