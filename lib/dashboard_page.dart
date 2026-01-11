@@ -30,39 +30,65 @@ class _DashboardPageState extends State<DashboardPage> {
   late String _currentSaldo; // Variabel saldo yang bisa berubah
   bool _isLoading = false;
 
+  // DATA DASHBOARD BARU DARI DATABASE
+  double _pemasukan = 0;
+  double _pengeluaran = 0;
+  List<dynamic> _beritaList = [];
+
   @override
   void initState() {
     super.initState();
     _currentSaldo = widget.saldo; // Set awal
-    _refreshSaldo(); // Auto refresh saat dibuka pertama kali
+    _refreshAllData(); // Auto refresh saat dibuka pertama kali
   }
 
-  // FUNGSI TARIK DATA TERBARU DARI SERVER
-  Future<void> _refreshSaldo() async {
+  // FUNGSI TARIK SEMUA DATA (DASHBOARD + SALDO)
+  Future<void> _refreshAllData() async {
     setState(() => _isLoading = true);
 
-    // IP Laptop Anda (Sesuaikan!)
-    String baseUrl = kIsWeb
-        ? 'http://localhost/api/get_saldo.php'
-        : 'http://192.168.18.10/api/get_saldo.php';
+    // FIX ROUTING API: Langsung ke folder /api karena user simpan di htdocs/api
+    String baseUrl = kIsWeb ? 'http://localhost/api' : 'http://10.0.2.2/api';
 
     try {
-      final response = await http.post(
-        Uri.parse(baseUrl),
+      // 1. AMBIL SALDO
+      final responseSaldo = await http.post(
+        Uri.parse('$baseUrl/get_saldo.php'),
         body: {'username': widget.username},
       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['success'] == true) {
-          setState(() {
-            double rawSaldo = double.tryParse(data['saldo'].toString()) ?? 0.0;
-            _currentSaldo = rawSaldo.toInt().toString();
-          });
-        }
+      // 2. AMBIL DASHBOARD (Pemasukan, Pengeluaran, Berita)
+      final responseDash = await http.post(
+        Uri.parse('$baseUrl/get_dashboard.php'),
+        body: {'username': widget.username},
+      );
+
+      if (mounted) {
+        setState(() {
+          // Update Saldo
+          if (responseSaldo.statusCode == 200) {
+            final dataSaldo = jsonDecode(responseSaldo.body);
+            if (dataSaldo['success'] == true) {
+              double rawSaldo =
+                  double.tryParse(dataSaldo['saldo'].toString()) ?? 0.0;
+              _currentSaldo = rawSaldo.toInt().toString();
+            }
+          }
+
+          // Update Info Dashboard
+          if (responseDash.statusCode == 200) {
+            final dataDash = jsonDecode(responseDash.body);
+            if (dataDash['success'] == true) {
+              _pemasukan =
+                  double.tryParse(dataDash['pemasukan'].toString()) ?? 0;
+              _pengeluaran =
+                  double.tryParse(dataDash['pengeluaran'].toString()) ?? 0;
+              _beritaList = dataDash['berita'] ?? [];
+            }
+          }
+        });
       }
     } catch (e) {
-      // Silent error: gagal refresh saldo tidak perlu mengganggu user
+      print("Error fetching data: $e");
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -79,7 +105,7 @@ class _DashboardPageState extends State<DashboardPage> {
       appBar: _buildAppBar(),
       body: RefreshIndicator(
         // FITUR TARIK UNTUK REFRESH
-        onRefresh: _refreshSaldo,
+        onRefresh: _refreshAllData,
         color: const Color(0xFF1A237E),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -111,12 +137,18 @@ class _DashboardPageState extends State<DashboardPage> {
               Row(
                 children: [
                   Expanded(
-                      child: _buildSummaryCard(Icons.arrow_downward,
-                          "Pemasukan", "Rp 385.000", Colors.green)),
+                      child: _buildSummaryCard(
+                          Icons.arrow_downward,
+                          "Pemasukan",
+                          currencyFormatter.format(_pemasukan),
+                          Colors.green)),
                   const SizedBox(width: 15),
                   Expanded(
-                      child: _buildSummaryCard(Icons.arrow_upward,
-                          "Pengeluaran", "Rp 380.000", Colors.redAccent)),
+                      child: _buildSummaryCard(
+                          Icons.arrow_upward,
+                          "Pengeluaran",
+                          currencyFormatter.format(_pengeluaran),
+                          Colors.redAccent)),
                 ],
               ),
 
@@ -131,11 +163,32 @@ class _DashboardPageState extends State<DashboardPage> {
                     color: Color(0xFF1A237E)),
               ),
               const SizedBox(height: 15),
-              _buildInfoCard(Icons.calendar_today,
-                  "Jadwal Ujian Tengah Semester", "20 Des 2025", Colors.orange),
-              const SizedBox(height: 10),
-              _buildInfoCard(Icons.notifications_active, "Pembayaran Kas Kelas",
-                  "Jumat Depan", Colors.blue),
+
+              // TAMPILKAN BERITA DARI DATABASE
+              if (_beritaList.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text("Belum ada info terbaru.",
+                      style: TextStyle(color: Colors.grey)),
+                )
+              else
+                ..._beritaList.map((berita) {
+                  return Column(
+                    children: [
+                      _buildInfoCard(
+                          berita['type'] == 'calendar'
+                              ? Icons.calendar_today
+                              : Icons.notifications_active,
+                          berita['title'] ?? "Info",
+                          berita['subtitle'] ?? "-",
+                          berita['date_text'] ?? "",
+                          berita['type'] == 'calendar'
+                              ? Colors.orange
+                              : Colors.blue),
+                      const SizedBox(height: 10),
+                    ],
+                  );
+                }).toList(),
 
               const SizedBox(height: 50), // Spasi bawah agar tidak mentok
             ],
@@ -290,7 +343,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     MaterialPageRoute(
                         builder: (context) =>
                             IsiSaldoPage(username: widget.username)))
-                .then((_) => _refreshSaldo()) // REFRESH SAAT KEMBALI
+                .then((_) => _refreshAllData()) // REFRESH SAAT KEMBALI
             ),
         _buildMenuIcon(
             context,
@@ -387,8 +440,8 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildInfoCard(
-      IconData icon, String title, String subtitle, Color color) {
+  Widget _buildInfoCard(IconData icon, String title, String subtitle,
+      String dateText, Color color) {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -418,6 +471,12 @@ class _DashboardPageState extends State<DashboardPage> {
                 const SizedBox(height: 4),
                 Text(subtitle,
                     style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                // Jika ada tanggal, bisa ditampilkan juga jika mau
+                if (dateText.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(dateText,
+                      style: TextStyle(color: Colors.grey[400], fontSize: 10)),
+                ]
               ],
             ),
           )
