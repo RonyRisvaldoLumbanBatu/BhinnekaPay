@@ -44,14 +44,14 @@ if ($check->num_rows == 0) {
     echo "Data dummy transaksi ditambahkan.<br>";
 }
 
-// Cek Berita
+// Cek Berita (KITA KOSONGKAN DULU SESUAI PERMINTAAN)
+/* 
 $checkNews = $connect->query("SELECT * FROM berita LIMIT 1");
 if ($checkNews->num_rows == 0) {
-    $connect->query("INSERT INTO berita (title, subtitle, date_text, type) VALUES ('Jadwal Ujian Tengah Semester', '20 - 25 Des 2025', '20 Des 2025', 'calendar')");
-    $connect->query("INSERT INTO berita (title, subtitle, date_text, type) VALUES ('Pembayaran Kas Kelas', 'Segera lunasi sebelum Jumat', 'Jumat Depan', 'notification')");
-    $connect->query("INSERT INTO berita (title, subtitle, date_text, type) VALUES ('Libur Nasional', 'Kampus tutup tanggal merah', 'Besok', 'calendar')");
-    echo "Data dummy berita ditambahkan.<br>";
-}
+   // Data dummy dinonaktifkan
+} 
+*/
+echo "Data dummy berita TIDAK ditambahkan (Kosong).<br>";
 
 echo "<h3>SELESAI! Database Dashboard Siap Digunakan.</h3>";
 ?>

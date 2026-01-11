@@ -39,6 +39,18 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
+
+# System Junk
+.metadata
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+
 # Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile
