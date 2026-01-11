@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart'; // Pastikan import ini ada
+import 'login_page.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -138,13 +140,16 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             elevation: 2,
                           ),
-                          child: const Text("BUAT AKUN",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: 1,
-                              )),
+                          child: _isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white)
+                              : const Text("BUAT AKUN",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: 1,
+                                  )),
                         ),
                       ),
 
@@ -186,52 +191,108 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // LOGIKA REGISTER (Dipisah)
-  void _handleRegister() {
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // FITUR AUTO-FILL NIM: Saat email diketik, otomatis isi NIM
+    _emailController.addListener(() {
+      String text = _emailController.text;
+      if (text.contains('@')) {
+        // Ambil bagian depan sebelum @
+        String possibleNim = text.split('@')[0];
+        // Cek apakah angka semua?
+        if (RegExp(r'^[0-9]+$').hasMatch(possibleNim)) {
+          _nimController.text = possibleNim;
+        }
+      } else {
+        // Jika belum ada @, anggap input adalah calon NIM juga (opsional)
+        if (RegExp(r'^[0-9]+$').hasMatch(text)) {
+          // _nimController.text = text; // Uncomment jika mau live-typing
+        }
+      }
+    });
+  }
+
+  // LOGIKA REGISTER KE SERVER
+  Future<void> _handleRegister() async {
     String nama = _nameController.text.trim();
     String nim = _nimController.text.trim();
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
     String confirm = _confirmPasswordController.text.trim();
 
-    if (nama.isEmpty ||
-        nim.isEmpty ||
-        email.isEmpty ||
-        password.isEmpty ||
-        confirm.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Semua data wajib diisi!"),
-          backgroundColor: Colors.redAccent,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    // 1. Validasi Dasar
+    if (nama.isEmpty || email.isEmpty || password.isEmpty || confirm.isEmpty) {
+      _showSnack("Harap isi Nama, Email, dan Password!", isError: true);
+      return;
+    }
+
+    // VALIDASI EMAIL KAMPUS
+    if (!email.endsWith("@students.satyaterrabhinneka.ac.id")) {
+      _showSnack(
+          "Wajib gunakan email kampus!\n(@students.satyaterrabhinneka.ac.id)",
+          isError: true);
       return;
     }
 
     if (password != confirm) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Konfirmasi Password tidak cocok!"),
-          backgroundColor: Colors.redAccent,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      _showSnack("Konfirmasi Password tidak cocok!", isError: true);
       return;
     }
 
+    setState(() => _isLoading = true);
+
+    // 2. Kirim ke Server
+    try {
+      // Deteksi URL (Ganti IP sesuai Laptopmu)
+      String baseUrl = 'http://192.168.18.10/api/register.php';
+      // Jika pakai emulator: 'http://10.0.2.2/api/register.php'
+
+      final response = await http.post(
+        Uri.parse(baseUrl),
+        body: {
+          'username': nama,
+          'email': email,
+          'password': password,
+          'nim':
+              nim, // NIM dikirim juga (bisa hasil auto-fill atau edit manual)
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        // SUKSES
+        _showSnack("Registrasi Berhasil! Silakan Login.", isError: false);
+        await Future.delayed(
+            const Duration(seconds: 2)); // Delay biar user baca
+
+        if (!mounted) return;
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+          (route) => false,
+        );
+      } else {
+        // GAGAL DARI SERVER
+        _showSnack(data['message'] ?? "Gagal Mendaftar", isError: true);
+      }
+    } catch (e) {
+      _showSnack("Gagal Koneksi ke Server.", isError: true);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSnack(String msg, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Registrasi Berhasil! Silakan Login."),
-        backgroundColor: Colors.green,
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: isError ? Colors.redAccent : Colors.green,
         behavior: SnackBarBehavior.floating,
       ),
-    );
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-      (route) => false,
     );
   }
 

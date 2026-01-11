@@ -329,6 +329,8 @@ class _LoginPageState extends State<LoginPage> {
           // --- SUKSES ---
           final role = data['role'];
           final username = data['username'];
+          final email = data['email'] ?? ""; // Ambil Email
+          final nim = data['nim']; // Ambil NIM
           final rawSaldo = double.tryParse(data['saldo'].toString()) ?? 0.0;
           final saldo = rawSaldo.toInt();
 
@@ -341,7 +343,12 @@ class _LoginPageState extends State<LoginPage> {
             destination = AdminMainPage(adminName: username);
           } else {
             // PASSING Data ke Main Page
-            destination = MainPage(username: username, saldo: saldo.toString());
+            destination = MainPage(
+              username: username,
+              saldo: saldo.toString(),
+              email: email,
+              nim: nim,
+            );
           }
 
           Navigator.pushReplacement(

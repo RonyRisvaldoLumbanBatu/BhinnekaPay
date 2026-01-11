@@ -8,8 +8,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 include 'koneksi.php';
 
-// MAGIC TRICK: Terima parameter COMPATIBILITY MODE
-// Jika 'username' ada, pakai itu. Jika tidak ada, cek apakah 'email' ada.
+// MAGIC TRICK: Terima parameter fleksibel (Username atau Email)
 $input_id = isset($_POST['username']) ? $_POST['username'] : (isset($_POST['email']) ? $_POST['email'] : '');
 $password = $_POST['password'];
 
@@ -26,7 +25,9 @@ if (mysqli_num_rows($result) > 0) {
     echo json_encode([
         'success' => true,
         'message' => 'Login Berhasil',
-        'username' => $row['username'],
+        'username' => $row['username'], // Nama User
+        'email' => $row['email'],       // Email Kampus (sumber NIM)
+        'nim' => $row['nim'],           // NIM (Jika sudah ada di DB)
         'saldo' => $row['saldo'],
         'role' => $row['role']
     ]);

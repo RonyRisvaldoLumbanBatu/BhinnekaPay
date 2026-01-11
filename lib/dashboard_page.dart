@@ -12,9 +12,15 @@ import 'split_bill_list_page.dart'; // Menu Split Bill (List)
 // UBAH JADI STATEFUL WIDGET AGAR SALDO BISA BERUBAH
 class DashboardPage extends StatefulWidget {
   final String username;
-  final String saldo; // Saldo awal dari Login
+  final String saldo;
+  final String? nim; // Tambah NIM
 
-  const DashboardPage({super.key, required this.username, required this.saldo});
+  const DashboardPage(
+      {super.key,
+      required this.username,
+      required this.saldo,
+      this.nim // Terima NIM
+      });
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -140,57 +146,69 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   PreferredSizeWidget _buildAppBar() {
+    // LOGIK INISIAL NAMA
+    String initials = "U";
+    if (widget.username.isNotEmpty) {
+      var words = widget.username.trim().split(" ");
+      if (words.length > 1) {
+        initials = "${words[0][0]}${words[1][0]}".toUpperCase();
+      } else {
+        initials = words[0][0].toUpperCase();
+      }
+    }
+
     return AppBar(
       backgroundColor: const Color(0xFF1A237E),
       elevation: 0,
       toolbarHeight: 80,
       title: Row(
         children: [
+          // AVATAR INISIAL
           Container(
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
             ),
-            child: const CircleAvatar(
+            child: CircleAvatar(
               radius: 20,
-              backgroundImage: AssetImage(
-                  'assets/profile_placeholder.png'), // Ganti dengan foto user jika ada
-              backgroundColor: Colors.grey,
+              backgroundColor: Colors.indigo.shade100,
+              child: Text(
+                initials,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Color(0xFF1A237E)),
+              ),
             ),
           ),
           const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text("Halo, ${widget.username}!",
-                      style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white)),
-                  const SizedBox(width: 5),
-                  const Text("👋", style: TextStyle(fontSize: 16)),
-                ],
-              ),
-              const Text("NIM: 2403310133",
-                  style: TextStyle(fontSize: 12, color: Colors.white70)),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text("Halo, ${widget.username}!",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                    ),
+                    const SizedBox(width: 5),
+                    const Text("👋", style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+                Text("NIM: ${widget.nim ?? '-'}", // HASIL AKHIR: NIM DINAMIS
+                    style:
+                        const TextStyle(fontSize: 12, color: Colors.white70)),
+              ],
+            ),
           ),
         ],
       ),
       actions: [
-        IconButton(
-          onPressed: _refreshSaldo, // Tombol Refresh Manual
-          icon: _isLoading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                      color: Colors.white, strokeWidth: 2))
-              : const Icon(Icons.refresh, color: Colors.white),
-        ),
         IconButton(
           onPressed: () {},
           icon: const Icon(Icons.notifications_outlined, color: Colors.white),
