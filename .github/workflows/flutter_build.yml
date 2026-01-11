@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # 1. Setup Java untuk Android Build
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: "zulu"
           java-version: "17"
@@ -39,9 +39,9 @@ jobs:
         run: flutter build apk --debug
 
       # 6. Upload APK ke GitHub Artifacts
-      # Nanti bisa didownload di menu "Actions" GitHub
+      # FIX: Menggunakan v4 karena v3 sudah deprecated
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bhinnekapay-debug
           path: build/app/outputs/flutter-apk/app-debug.apk
