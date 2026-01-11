@@ -29,15 +29,17 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
-      # 4. Cek Kualitas Kode (Linting)
-      # FIX: Tambahkan 'continue-on-error: true' supaya warning tidak membatalkan build APK
-      # Biarkan dia mengomel, tapi tetap lanjut kerja.
+      # 4. Analyze Code (Tetap lanjut meski ada warning)
       - name: Analyze Code
         continue-on-error: true
         run: flutter analyze
 
       # 5. Build APK (Debug Version)
+      # FIX: Tambahkan _JAVA_OPTIONS untuk menaikkan RAM ke 4GB (Max Heap)
+      # Ini solusi untuk error "Java heap space"
       - name: Build Android APK
+        env:
+          _JAVA_OPTIONS: "-Xmx4096m"
         run: flutter build apk --debug
 
       # 6. Upload APK ke GitHub
