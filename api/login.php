@@ -22,12 +22,15 @@ $result = mysqli_query($connect, $query_sql);
 
 if (mysqli_num_rows($result) > 0) {
     $row = mysqli_fetch_assoc($result);
+    // PASTIKAN KOLOM 'kelas' ADA DI DATABASE ANDA
     echo json_encode([
         'success' => true,
         'message' => 'Login Berhasil',
         'username' => $row['username'], // Nama User
-        'email' => $row['email'],       // Email Kampus (sumber NIM)
-        'nim' => $row['nim'],           // NIM (Jika sudah ada di DB)
+        'email' => $row['email'],       // Email Kampus
+        'nim' => $row['nim'],           // NIM
+        'kelas' => isset($row['kelas']) ? $row['kelas'] : '-',
+        'role_kelas' => isset($row['role_kelas']) ? $row['role_kelas'] : 'anggota', // <--- ROLE KELAS (Bendahara/Anggota)
         'saldo' => $row['saldo'],
         'role' => $row['role']
     ]);

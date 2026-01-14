@@ -14,13 +14,18 @@ class MainPage extends StatefulWidget {
   final String saldo;
   final String email;
   final String? nim;
+  final String kelas;
+  final String roleKelas; // <-- BARU: Bendahara / Anggota
 
-  const MainPage(
-      {super.key,
-      required this.username,
-      required this.saldo,
-      this.email = "",
-      this.nim});
+  const MainPage({
+    super.key,
+    required this.username,
+    required this.saldo,
+    this.email = "",
+    this.nim,
+    this.kelas = "-",
+    this.roleKelas = "anggota", // Default role
+  });
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -35,7 +40,7 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  // --- MENU MODAL "ULTRA PREMIUM" (REVISI FINAL) ---
+  // --- MENU MODAL "ULTRA PREMIUM" ---
   void _showTransactionMenu() {
     showModalBottomSheet(
       context: context,
@@ -46,176 +51,176 @@ class _MainPageState extends State<MainPage> {
         bool isKirimMode = false;
 
         return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setSheetState) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            height: 400, // Tinggi aman
-            decoration: const BoxDecoration(
-              color: Color(0xFFFAFAFA),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-              ),
-              boxShadow: [
-                BoxShadow(
+          builder: (BuildContext context, StateSetter setSheetState) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              height: 400, // Tinggi aman
+              decoration: const BoxDecoration(
+                color: Color(0xFFFAFAFA),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+                boxShadow: [
+                  BoxShadow(
                     color: Colors.black12,
                     blurRadius: 20,
-                    offset: Offset(0, -5))
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 15),
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(10)),
+                    offset: Offset(0, -5),
                   ),
-                ),
-                const SizedBox(height: 25),
-
-                // HEADER NAVIGASI
-                Row(
-                  children: [
-                    if (isKirimMode) ...[
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                        onPressed: () {
-                          // KEMBALI KE MENU AWAL
-                          setSheetState(() {
-                            isKirimMode = false;
-                          });
-                        },
-                        color: Colors.black87,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: Text(
-                        isKirimMode ? "Metode Kirim" : "Mau Transaksi Apa?",
-                        key: ValueKey(isKirimMode),
-                        style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF1A237E)),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 15),
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  isKirimMode
-                      ? "Pilih cara mengirim saldo ke teman"
-                      : "Silakan pilih layanan di bawah",
-                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                ),
-                const SizedBox(height: 25),
+                  ),
+                  const SizedBox(height: 25),
 
-                // LOGIKA TAMPILAN (LANGSUNG DISINI AGAR VARIABEL TERBACA)
-                Expanded(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 400),
-                    transitionBuilder:
-                        (Widget child, Animation<double> animation) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                    child: isKirimMode
-                        ?
-                        // === TAMPILAN 2: PILIHAN METODE KIRIM ===
-                        Row(
-                            key: const ValueKey("MenuKirim"),
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: _buildVerticalCard(
-                                  icon: Icons.qr_code_scanner_rounded,
-                                  title: "Scan QR",
-                                  color: Colors.orange,
+                  // HEADER NAVIGASI
+                  Row(
+                    children: [
+                      if (isKirimMode) ...[
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                          onPressed: () {
+                            setSheetState(() {
+                              isKirimMode = false;
+                            });
+                          },
+                          color: Colors.black87,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                        const SizedBox(width: 10),
+                      ],
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: Text(
+                          isKirimMode ? "Metode Kirim" : "Mau Transaksi Apa?",
+                          key: ValueKey(isKirimMode),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF1A237E),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    isKirimMode
+                        ? "Pilih cara mengirim saldo ke teman"
+                        : "Silakan pilih layanan di bawah",
+                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                  ),
+                  const SizedBox(height: 25),
+
+                  // LOGIKA TAMPILAN
+                  Expanded(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 400),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                      child: isKirimMode
+                          ? Row(
+                              key: const ValueKey("MenuKirim"),
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: _buildVerticalCard(
+                                    icon: Icons.qr_code_scanner_rounded,
+                                    title: "Scan QR",
+                                    color: Colors.orange,
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (c) => const QrScanPage(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 15),
+                                Expanded(
+                                  child: _buildVerticalCard(
+                                    icon: Icons.edit_note_rounded,
+                                    title: "Input NIM",
+                                    color: Colors.blueAccent,
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (c) => InputNimPage(
+                                            username: widget.username,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              key: const ValueKey("MenuUtama"),
+                              children: [
+                                _buildPremiumCard(
+                                  icon: Icons.send_rounded,
+                                  title: "Kirim Saldo",
+                                  subtitle: "Transfer ke teman via QR / NIM",
+                                  color: const Color(0xFFFF5252),
+                                  onTap: () {
+                                    setSheetState(() {
+                                      isKirimMode = true;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 15),
+                                _buildPremiumCard(
+                                  icon: Icons.qr_code_2_rounded,
+                                  title: "Minta Saldo",
+                                  subtitle: "Tampilkan QR Code saya",
+                                  color: const Color(0xFF43A047),
                                   onTap: () {
                                     Navigator.pop(context);
                                     Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (c) =>
-                                                const QrScanPage()));
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 15),
-                              Expanded(
-                                child: _buildVerticalCard(
-                                  icon: Icons.edit_note_rounded,
-                                  title: "Input NIM",
-                                  color: Colors.blueAccent,
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (c) => InputNimPage(
-                                                username: widget.username)));
-                                  },
-                                ),
-                              ),
-                            ],
-                          )
-                        :
-                        // === TAMPILAN 1: MENU UTAMA (KIRIM & MINTA) ===
-                        Column(
-                            key: const ValueKey("MenuUtama"),
-                            children: [
-                              // TOMBOL 1: KIRIM SALDO
-                              _buildPremiumCard(
-                                icon: Icons.send_rounded,
-                                title: "Kirim Saldo",
-                                subtitle: "Transfer ke teman via QR / NIM",
-                                color: const Color(0xFFFF5252),
-                                onTap: () {
-                                  // TRIGGER PINDAH MENU
-                                  setSheetState(() {
-                                    isKirimMode = true;
-                                  });
-                                },
-                              ),
-
-                              const SizedBox(height: 15),
-
-                              // TOMBOL 2: MINTA SALDO (YANG TADI HILANG)
-                              _buildPremiumCard(
-                                icon: Icons.qr_code_2_rounded,
-                                title: "Minta Saldo",
-                                subtitle: "Tampilkan QR Code saya",
-                                color: const Color(0xFF43A047),
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (c) => RequestSaldoPage(
-                                              username: widget.username,
-                                              nim: widget.nim)));
-                                },
-                              ),
-                            ],
-                          ),
+                                        builder: (c) => RequestSaldoPage(
+                                          username: widget.username,
+                                          nim: widget.nim,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        });
+                ],
+              ),
+            );
+          },
+        );
       },
     );
   }
 
-  // WIDGET CARD HORIZONTAL
   Widget _buildPremiumCard({
     required IconData icon,
     required String title,
@@ -236,9 +241,10 @@ class _MainPageState extends State<MainPage> {
             border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
             boxShadow: [
               BoxShadow(
-                  color: Colors.grey.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4))
+                color: Colors.grey.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
             ],
           ),
           child: Row(
@@ -256,13 +262,18 @@ class _MainPageState extends State<MainPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(subtitle,
-                        style:
-                            TextStyle(color: Colors.grey[500], fontSize: 12)),
+                    Text(
+                      subtitle,
+                      style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                    ),
                   ],
                 ),
               ),
@@ -274,12 +285,12 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  // WIDGET CARD VERTIKAL
-  Widget _buildVerticalCard(
-      {required IconData icon,
-      required String title,
-      required Color color,
-      required VoidCallback onTap}) {
+  Widget _buildVerticalCard({
+    required IconData icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(20),
@@ -294,9 +305,10 @@ class _MainPageState extends State<MainPage> {
             border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
             boxShadow: [
               BoxShadow(
-                  color: Colors.grey.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4))
+                color: Colors.grey.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
             ],
           ),
           child: Column(
@@ -311,9 +323,13 @@ class _MainPageState extends State<MainPage> {
                 child: Icon(icon, color: color, size: 36),
               ),
               const SizedBox(height: 15),
-              Text(title,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 15)),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
             ],
           ),
         ),
@@ -321,7 +337,6 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  // --- NAVIGASI BAWAH ---
   Widget _buildNavItem(IconData icon, String label, int index) {
     final bool isSelected = _selectedIndex == index;
     return Expanded(
@@ -331,16 +346,20 @@ class _MainPageState extends State<MainPage> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon,
-                color: isSelected ? const Color(0xFF1A237E) : Colors.grey,
-                size: 26),
+            Icon(
+              icon,
+              color: isSelected ? const Color(0xFF1A237E) : Colors.grey,
+              size: 26,
+            ),
             const SizedBox(height: 4),
-            Text(label,
-                style: TextStyle(
-                    color: isSelected ? const Color(0xFF1A237E) : Colors.grey,
-                    fontSize: 11,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal)),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? const Color(0xFF1A237E) : Colors.grey,
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
           ],
         ),
       ),
@@ -352,16 +371,31 @@ class _MainPageState extends State<MainPage> {
     // List halaman content
     final List<Widget> pages = [
       DashboardPage(
-          username: widget.username, saldo: widget.saldo, nim: widget.nim),
+        username: widget.username,
+        saldo: widget.saldo,
+        nim: widget.nim,
+        kelas: widget.kelas, // <-- PASS KELAS
+        roleKelas: widget.roleKelas, // <-- PASS ROLE
+      ),
       CicilanPage(
-          username: widget.username,
-          saldo: widget.saldo,
-          email: widget.email,
-          nim: widget.nim), // <--- Updated here
+        username: widget.username,
+        saldo: widget.saldo,
+        email: widget.email,
+        nim: widget.nim,
+      ),
       Container(), // Placeholder tengah
-      KasPage(username: widget.username),
+      KasPage(
+        username: widget.username,
+        kelas: widget.kelas,
+        roleKelas: widget.roleKelas,
+        nim: widget.nim ?? "-", // <-- PASSING NIM KE KASPAGE
+      ),
       EditProfilePage(
-          username: widget.username, email: widget.email, nim: widget.nim),
+        username: widget.username,
+        email: widget.email,
+        nim: widget.nim,
+        kelas: widget.kelas,
+      ),
     ];
 
     return Scaffold(

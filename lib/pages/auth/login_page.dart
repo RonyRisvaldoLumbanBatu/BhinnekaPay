@@ -209,11 +209,13 @@ class _LoginPageState extends State<LoginPage> {
                       // INPUT PASSWORD
                       _buildModernPasswordField(),
 
-                      // OPSI TAMBAHAN
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // OPSI TAMBAHAN (Updated: Pakai Wrap biar responsif)
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        alignment: WrapAlignment.spaceBetween,
                         children: [
                           Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Checkbox(
                                 value: _rememberMe,
@@ -331,6 +333,7 @@ class _LoginPageState extends State<LoginPage> {
           final username = data['username'];
           final email = data['email'] ?? ""; // Ambil Email
           final nim = data['nim']; // Ambil NIM
+          final kelas = data['kelas'] ?? "-"; // Ambil Kelas (DEFAULT "-")
           final rawSaldo = double.tryParse(data['saldo'].toString()) ?? 0.0;
           final saldo = rawSaldo.toInt();
 
@@ -348,6 +351,9 @@ class _LoginPageState extends State<LoginPage> {
               saldo: saldo.toString(),
               email: email,
               nim: nim,
+              kelas: kelas, // <--- PASSING KELAS
+              roleKelas: data['role_kelas'] ??
+                  "anggota", // <--- PASSING ROLE KELAS (FIXED)
             );
           }
 
@@ -379,7 +385,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // WIDGET TEXT FIELD (Fixed: Border Biru KEMBALI!)
+  // WIDGET TEXT FIELD
   Widget _buildModernTextField(
       {required String label,
       required IconData icon,
