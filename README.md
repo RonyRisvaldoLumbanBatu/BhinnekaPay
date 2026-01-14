@@ -12,42 +12,38 @@ Aplikasi ini hadir dengan antarmuka yang modern, bersih, dan mudah digunakan, me
 
 ## ✨ Fitur Unggulan
 
-### 🔐 1. Autentikasi Modern
+### 🔐 1. Autentikasi Modern & Dashboard
 
-- **Login & Register UI**: Desain antarmuka baru dengan gaya _Modern Fintech_.
-- **Clean Aesthetic**: Menggunakan kombinasi warna **Navy Blue** (`#1A237E`) yang elegan dan _White Rounded Bottom Sheet_.
-- **Interaktif**: Efek visual _active state_ pada kolom input dan _feedback_ pengguna yang responsif.
-- **Identitas Kampus**: Integrasi nuansa kampus yang halus namun tetap profesional.
+- **Login & Register**: UI modern dengan validasi real-time.
+- **Dashboard Interaktif**: Menampilkan saldo, pemasukan, pengeluaran, dan berita kampus terbaru.
+- **Role System**: Mendukung User Mahasiswa, Admin Biro, dan Super Admin.
 
-### 💸 2. Manajemen Keuangan (Coming Soon)
+### 💸 2. Manajemen Keuangan
 
-- **Split Bill**: Fitur untuk membagi tagihan makan atau tugas kelompok dengan teman secara mudah.
-- **Transfer & Pembayaran**: Kemudahan transaksi di dalam lingkungan kampus.
-
----
-
-## 🎨 Galeri Tampilan (Preview)
-
-|               Halaman Login               |            Halaman Daftar            |
-| :---------------------------------------: | :----------------------------------: |
-| _Modern Navy Header dengan nuansa kampus_ | _Clean Form dengan UX yang intuitif_ |
-
-> _Catatan: Screenshot aplikasi dapat ditambahkan di sini nanti._
+- **Cicilan Kuliah**: Cek status tagihan SPP, Uang Gedung, dll.
+- **Isi Saldo & Transfer**: Simulasi top-up dan kirim saldo antar mahasiswa.
+- **Kas Kelas**: Manajemen iuran kelas mingguan/bulanan.
+- **Split Bill**: (Coming Soon) Bagi tagihan dengan teman.
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
+## 🛠️ Teknologi & Arsitektur
 
 - **Framework**: [Flutter](https://flutter.dev/) (Google UI Toolkit)
 - **Bahasa Pemrograman**: Dart
-- **IDE**: Visual Studio Code / Android Studio
-- **Manajemen Aset**: Mendukung format gambar modern.
+- **Backend**: PHP Native (API)
+- **Database**: MySQL
+- **Struktur Folder Modular**:
+  - `lib/pages/auth`: Halaman Login & Registrasi
+  - `lib/pages/home`: Halaman Utama & Dashboard
+  - `lib/pages/transaksi`: Fitur Pembayaran & Invoice
+  - `lib/pages/fitur`: Modul (Cicilan, Kas, dll)
+  - `lib/pages/admin`: Panel Admin
+  - `lib/api`: Backend Script (PHP)
 
 ---
 
 ## 🚀 Cara Menjalankan Aplikasi
-
-Ikuti langkah-langkah berikut untuk menjalankan proyek ini di mesin lokal Anda:
 
 1.  **Clone Repository**
 
@@ -56,26 +52,22 @@ Ikuti langkah-langkah berikut untuk menjalankan proyek ini di mesin lokal Anda:
     cd bhinneka-pay-mobile
     ```
 
-2.  **Instal Dependensi**
-    Pastikan Flutter SDK sudah terinstal, lalu jalankan:
+2.  **Setup Backend**
 
+    - Pindahkan folder `api` ke dalam `htdocs` (jika menggunakan XAMPP).
+    - Import database `bhinnekapay_db` (jika ada SQL-nya).
+    - Sesuaikan `koneksi.php` jika perlu.
+
+3.  **Jalankan Flutter**
     ```bash
     flutter pub get
-    ```
-
-3.  **Jalankan Aplikasi**
-    Koneksikan HP Android atau gunakan Emulator, lalu ketik:
-    ```bash
     flutter run
     ```
-    _(Gunakan `flutter run -d chrome` untuk preview cepat di browser)_
 
 ---
 
 ## 👤 Kontributor
 
 Dikembangkan oleh **Rony Risvaldo Lumban Batu** sebagai bagian dari proyek pengembangan sistem keuangan digital kampus.
-
----
 
 _Dibuat dengan ❤️ menggunakan Flutter._

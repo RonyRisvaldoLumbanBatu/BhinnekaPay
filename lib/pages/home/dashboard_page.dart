@@ -4,10 +4,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/foundation.dart'; // Untuk kIsWeb
 
-import 'isi_saldo_page.dart'; // Menu Isi Saldo
-import 'cicilan_page.dart'; // Menu Cicilan
-import 'kas_page.dart'; // Menu Kas
-import 'split_bill_list_page.dart'; // Menu Split Bill (List)
+import 'package:minibank/pages/transaksi/isi_saldo_page.dart'; // Menu Isi Saldo
+import 'package:minibank/pages/fitur/cicilan_page.dart'; // Menu Cicilan
+import 'package:minibank/pages/fitur/kas_page.dart'; // Menu Kas
+import 'package:minibank/pages/fitur/split_bill_list_page.dart'; // Menu Split Bill (List)
 
 // UBAH JADI STATEFUL WIDGET AGAR SALDO BISA BERUBAH
 class DashboardPage extends StatefulWidget {
@@ -352,8 +352,10 @@ class _DashboardPageState extends State<DashboardPage> {
             () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        CicilanPage(username: widget.username)))),
+                    builder: (context) => CicilanPage(
+                        username: widget.username,
+                        saldo: _currentSaldo,
+                        nim: widget.nim)))), // <--- UDPATED: Pass saldo and nim
         _buildMenuIcon(
             context,
             Icons.monetization_on_outlined,

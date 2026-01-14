@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'qr_saldo_page.dart'; // Import Halaman QR
+import 'package:minibank/pages/transaksi/qr_saldo_page.dart'; // Import Halaman QR
 
 class IsiSaldoPage extends StatefulWidget {
   final String username;

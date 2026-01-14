@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart';
+import 'package:minibank/pages/auth/login_page.dart';
 // IMPORT HALAMAN BARU
-import 'riwayat_page.dart';
-import 'ubah_profil_page.dart';
-import 'keamanan_page.dart';
-import 'limit_page.dart';
-import 'pengaturan_page.dart';
-import 'bantuan_page.dart';
-import 'tentang_page.dart';
-import 'notification_page.dart';
+import 'package:minibank/pages/transaksi/riwayat_page.dart';
+import 'package:minibank/pages/profil/ubah_profil_page.dart';
+import 'package:minibank/pages/profil/keamanan_page.dart';
+import 'package:minibank/pages/fitur/limit_page.dart';
+import 'package:minibank/pages/profil/pengaturan_page.dart';
+import 'package:minibank/pages/profil/bantuan_page.dart';
+import 'package:minibank/pages/profil/tentang_page.dart';
+import 'package:minibank/pages/home/notification_page.dart';
 
 class EditProfilePage extends StatelessWidget {
   final String username;

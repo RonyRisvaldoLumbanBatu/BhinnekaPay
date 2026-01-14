@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:minibank/main_page.dart';
+import 'package:minibank/pages/home/main_page.dart';
 
 class PdfInvoicePage extends StatelessWidget {
   // 1. Simpan waktu saat halaman Invoice dibuka (Snapshot)
   final DateTime transactionTime = DateTime.now();
-  
-  // 2. Tambahkan variable username (agar bisa balik ke MainPage)
-  final String username; // <--- PERBAIKAN 1: Tambahkan ini
 
-  // 3. Wajibkan di konstruktor (Hapus const karena DateTime.now())
-  PdfInvoicePage({super.key, required this.username}); // <--- PERBAIKAN 2: Tambahkan required
+  // 2. Tambahkan variable username (agar bisa balik ke MainPage)
+  final String username;
+  final String saldo;
+  final String email;
+  final String? nim;
+
+  // 3. Wajibkan di konstruktor
+  PdfInvoicePage(
+      {super.key,
+      required this.username,
+      required this.saldo,
+      this.email = "",
+      this.nim});
 
   // --- HELPER FORMAT TANGGAL (MANUAL - INDONESIA) ---
   String _formatSimpleDate(DateTime time) {
@@ -18,13 +26,29 @@ class PdfInvoicePage extends StatelessWidget {
 
   String _formatDetailedDate(DateTime time) {
     List<String> namaHari = [
-      'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+      'Minggu'
     ];
     List<String> namaBulan = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember'
     ];
-    
+
     String hari = namaHari[time.weekday - 1];
     String bulan = namaBulan[time.month - 1];
     String jam = time.hour.toString().padLeft(2, '0');
@@ -66,11 +90,13 @@ class PdfInvoicePage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 4),
-                      Text("Laporan Pembayaran Digital", style: TextStyle(color: Colors.grey)),
+                      Text("Laporan Pembayaran Digital",
+                          style: TextStyle(color: Colors.grey)),
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.green[50],
                       borderRadius: BorderRadius.circular(20),
@@ -80,23 +106,24 @@ class PdfInvoicePage extends StatelessWidget {
                       children: const [
                         Icon(Icons.check_circle, color: Colors.green, size: 16),
                         SizedBox(width: 4),
-                        Text("LUNAS", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                        Text("LUNAS",
+                            style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold)),
                       ],
                     ),
                   )
                 ],
               ),
               const SizedBox(height: 8),
-              
+
               // TANGGAL HEADER (DINAMIS)
               Align(
                 alignment: Alignment.centerRight,
-                child: Text(
-                  "Tanggal: ${_formatSimpleDate(transactionTime)}", 
-                  style: const TextStyle(fontSize: 12)
-                ),
+                child: Text("Tanggal: ${_formatSimpleDate(transactionTime)}",
+                    style: const TextStyle(fontSize: 12)),
               ),
-              
+
               const Divider(thickness: 2, color: Color(0xFF304FFE)),
               const SizedBox(height: 20),
 
@@ -109,16 +136,20 @@ class PdfInvoicePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Informasi Pembayaran", style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text("Informasi Pembayaran",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                         const SizedBox(height: 10),
-                        _buildInfoText("No. Invoice:", "INV/${transactionTime.year}/${transactionTime.month}/${transactionTime.day}/1875"), // Contoh No Invoice Dinamis
+                        _buildInfoText("No. Invoice:",
+                            "INV/${transactionTime.year}/${transactionTime.month}/${transactionTime.day}/1875"), // Contoh No Invoice Dinamis
                         const SizedBox(height: 8),
-                        
+
                         // TANGGAL BODY (DINAMIS)
-                        _buildInfoText("Tanggal:", _formatDetailedDate(transactionTime)),
-                        
+                        _buildInfoText(
+                            "Tanggal:", _formatDetailedDate(transactionTime)),
+
                         const SizedBox(height: 8),
-                        _buildInfoRowColored("Status:", "Berhasil", Colors.green),
+                        _buildInfoRowColored(
+                            "Status:", "Berhasil", Colors.green),
                       ],
                     ),
                   ),
@@ -127,7 +158,8 @@ class PdfInvoicePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Metode Pembayaran", style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text("Metode Pembayaran",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                         const SizedBox(height: 10),
                         _buildInfoText("Platform:", "Bhinneka Pay"),
                         const SizedBox(height: 8),
@@ -142,7 +174,9 @@ class PdfInvoicePage extends StatelessWidget {
               const SizedBox(height: 30),
 
               // --- RINGKASAN PEMBAYARAN ---
-              const Text("Ringkasan Pembayaran", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+              const Text("Ringkasan Pembayaran",
+                  style: TextStyle(
+                      color: Colors.grey, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(16),
@@ -156,14 +190,17 @@ class PdfInvoicePage extends StatelessWidget {
                     const Divider(),
                     _buildSummaryRow("Jumlah Minggu", "2 Minggu"),
                     const Divider(),
-                    _buildSummaryRow("Total Dibayar", "Rp 450.000", isPrimary: true),
+                    _buildSummaryRow("Total Dibayar", "Rp 450.000",
+                        isPrimary: true),
                   ],
                 ),
               ),
               const SizedBox(height: 30),
 
               // --- RINCIAN TAGIHAN ---
-              const Text("Rincian Tagihan", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+              const Text("Rincian Tagihan",
+                  style: TextStyle(
+                      color: Colors.grey, fontWeight: FontWeight.bold)),
               const Divider(),
               _buildTableRow("Keterangan", "Jumlah", isHeader: true),
               const Divider(),
@@ -185,7 +222,8 @@ class PdfInvoicePage extends StatelessWidget {
                 ),
                 child: const Text(
                   "Dokumen ini merupakan bukti pembayaran yang sah dan dihasilkan secara otomatis oleh sistem. Tidak diperlukan tanda tangan basah.",
-                  style: TextStyle(fontSize: 11, color: Colors.black87, height: 1.5),
+                  style: TextStyle(
+                      fontSize: 11, color: Colors.black87, height: 1.5),
                   textAlign: TextAlign.justify,
                 ),
               ),
@@ -195,14 +233,18 @@ class PdfInvoicePage extends StatelessWidget {
               Center(
                 child: Column(
                   children: [
-                    const Text("Bhinneka Pay - Sistem Pembayaran Digital", style: TextStyle(fontSize: 10, color: Colors.grey)),
+                    const Text("Bhinneka Pay - Sistem Pembayaran Digital",
+                        style: TextStyle(fontSize: 10, color: Colors.grey)),
                     // TANGGAL FOOTER (DINAMIS)
-                    Text("Dokumen ini dicetak pada: ${_formatFooterDate(transactionTime)}", style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                    Text(
+                        "Dokumen ini dicetak pada: ${_formatFooterDate(transactionTime)}",
+                        style:
+                            const TextStyle(fontSize: 10, color: Colors.grey)),
                   ],
                 ),
               ),
               const SizedBox(height: 30),
-              
+
               // --- TOMBOL AKSI ---
               Row(
                 children: [
@@ -210,38 +252,48 @@ class PdfInvoicePage extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        Navigator.pop(context); 
+                        Navigator.pop(context);
                       },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.red,
                         side: const BorderSide(color: Colors.red),
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
                       ),
-                      child: const Text("Tutup", style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: const Text("Tutup",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
-                  
+
                   const SizedBox(width: 16),
 
                   // 2. TOMBOL KE BERANDA (BIRU) - PushAndRemoveUntil
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                         // PERBAIKAN 3: Kirim balik username ke MainPage
-                         Navigator.pushAndRemoveUntil(
+                        // PERBAIKAN 3: Kirim balik username ke MainPage
+                        Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (context) => MainPage(username: username)), 
-                          (route) => false, 
+                          MaterialPageRoute(
+                              builder: (context) => MainPage(
+                                    username: username,
+                                    saldo: saldo,
+                                    email: email,
+                                    nim: nim,
+                                  )),
+                          (route) => false,
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF304FFE),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
                       ),
-                      child: const Text("Ke Beranda", style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: const Text("Ke Beranda",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -261,7 +313,8 @@ class PdfInvoicePage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-        Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+        Text(value,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -271,51 +324,50 @@ class PdfInvoicePage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-        Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
+        Text(value,
+            style: TextStyle(
+                fontSize: 12, fontWeight: FontWeight.bold, color: color)),
       ],
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, {bool isPrimary = false}) {
+  Widget _buildSummaryRow(String label, String value,
+      {bool isPrimary = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(fontSize: 13)),
-          Text(
-            value, 
-            style: TextStyle(
-              fontSize: 13, 
-              fontWeight: FontWeight.bold,
-              color: isPrimary ? const Color(0xFF304FFE) : Colors.black
-            )
-          ),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: isPrimary ? const Color(0xFF304FFE) : Colors.black)),
         ],
       ),
     );
   }
 
-  Widget _buildTableRow(String col1, String col2, {bool isHeader = false, bool isBold = false}) {
+  Widget _buildTableRow(String col1, String col2,
+      {bool isHeader = false, bool isBold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            col1, 
-            style: TextStyle(
-              fontWeight: (isHeader || isBold) ? FontWeight.bold : FontWeight.normal,
-              fontSize: 13
-            )
-          ),
-          Text(
-            col2, 
-            style: TextStyle(
-              fontWeight: (isHeader || isBold) ? FontWeight.bold : FontWeight.normal,
-              fontSize: 13
-            )
-          ),
+          Text(col1,
+              style: TextStyle(
+                  fontWeight: (isHeader || isBold)
+                      ? FontWeight.bold
+                      : FontWeight.normal,
+                  fontSize: 13)),
+          Text(col2,
+              style: TextStyle(
+                  fontWeight: (isHeader || isBold)
+                      ? FontWeight.bold
+                      : FontWeight.normal,
+                  fontSize: 13)),
         ],
       ),
     );

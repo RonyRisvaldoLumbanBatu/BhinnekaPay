@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:minibank/main_page.dart';
-import 'dart:io'; 
+import 'package:minibank/pages/home/main_page.dart';
+import 'dart:io';
 
 class BuktiKasPage extends StatelessWidget {
   final int totalBayar;
   final int jumlahMinggu;
   final String imagePath; // Path gambar bukti transfer
-  final String username;  // <--- 1. ADDED: Username parameter to maintain state
-  
+  final String username;
+  final String saldo; // Added
+  final String email;
+  final String? nim;
+
   final DateTime transactionTime = DateTime.now();
 
   BuktiKasPage({
@@ -15,7 +18,10 @@ class BuktiKasPage extends StatelessWidget {
     required this.totalBayar,
     required this.jumlahMinggu,
     required this.imagePath,
-    required this.username, // <--- 2. ADDED: Require username in constructor
+    required this.username,
+    required this.saldo, // Require this
+    this.email = "",
+    this.nim,
   });
 
   // Helper Format Rupiah
@@ -54,7 +60,8 @@ class BuktiKasPage extends StatelessWidget {
                   const Icon(Icons.check_circle, color: Colors.green, size: 60),
                   const SizedBox(height: 10),
                   const Text("Pembayaran Berhasil Dikirim",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                   const SizedBox(height: 5),
                   Text(_formatDate(transactionTime),
                       style: const TextStyle(color: Colors.grey)),
@@ -66,19 +73,22 @@ class BuktiKasPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             // --- DETAIL TRANSAKSI ---
-            const Text("Detail Pembayaran", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text("Detail Pembayaran",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 16),
-            
+
             _buildRow("Jenis Pembayaran", "Uang Kas Kelas"),
             _buildRow("Periode", "$jumlahMinggu Minggu"),
             _buildRow("Harga per Minggu", "Rp10.000"),
             const Divider(),
-            _buildRow("Total Bayar", _formatRupiah(totalBayar), isBold: true, color: const Color(0xFF1A237E)),
-            
+            _buildRow("Total Bayar", _formatRupiah(totalBayar),
+                isBold: true, color: const Color(0xFF1A237E)),
+
             const SizedBox(height: 20),
 
             // --- FOTO BUKTI ---
-            const Text("Bukti Foto:", style: TextStyle(fontSize: 12, color: Colors.grey)),
+            const Text("Bukti Foto:",
+                style: TextStyle(fontSize: 12, color: Colors.grey)),
             const SizedBox(height: 8),
             Container(
               height: 200,
@@ -120,18 +130,23 @@ class BuktiKasPage extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                   Navigator.pushAndRemoveUntil(
+                  Navigator.pushAndRemoveUntil(
                     context,
-                    // <--- 3. FIX: Pass the username back to MainPage
-                    MaterialPageRoute(builder: (context) => MainPage(username: username)), 
-                    (route) => false, 
+                    MaterialPageRoute(
+                        builder: (context) => MainPage(
+                            username: username,
+                            saldo: saldo,
+                            email: email,
+                            nim: nim)), // Pass valid args
+                    (route) => false,
                   );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A237E),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-                child: const Text("Kembali ke Beranda", style: TextStyle(color: Colors.white)),
+                child: const Text("Kembali ke Beranda",
+                    style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -140,7 +155,8 @@ class BuktiKasPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(String label, String value, {bool isBold = false, Color? color}) {
+  Widget _buildRow(String label, String value,
+      {bool isBold = false, Color? color}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(

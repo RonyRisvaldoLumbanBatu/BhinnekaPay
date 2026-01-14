@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 // --- IMPORT HALAMAN ---
-import 'dashboard_page.dart';
-import 'kas_page.dart';
-import 'edit_profile_page.dart';
-import 'cicilan_page.dart';
-import 'qr_scan_page.dart';
-import 'input_nim_page.dart';
-import 'request_saldo_page.dart';
+import 'package:minibank/pages/home/dashboard_page.dart';
+import 'package:minibank/pages/fitur/kas_page.dart';
+import 'package:minibank/pages/profil/edit_profile_page.dart';
+import 'package:minibank/pages/fitur/cicilan_page.dart';
+import 'package:minibank/pages/transaksi/qr_scan_page.dart';
+import 'package:minibank/pages/transaksi/input_nim_page.dart';
+import 'package:minibank/pages/transaksi/request_saldo_page.dart';
 
 class MainPage extends StatefulWidget {
   final String username;
@@ -233,10 +233,10 @@ class _MainPageState extends State<MainPage> {
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.grey.withOpacity(0.1)),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
             boxShadow: [
               BoxShadow(
-                  color: Colors.grey.withOpacity(0.05),
+                  color: Colors.grey.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4))
             ],
@@ -246,7 +246,7 @@ class _MainPageState extends State<MainPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(icon, color: color, size: 28),
@@ -291,10 +291,10 @@ class _MainPageState extends State<MainPage> {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.grey.withOpacity(0.1)),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
             boxShadow: [
               BoxShadow(
-                  color: Colors.grey.withOpacity(0.05),
+                  color: Colors.grey.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4))
             ],
@@ -305,7 +305,7 @@ class _MainPageState extends State<MainPage> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: color, size: 36),
@@ -353,7 +353,11 @@ class _MainPageState extends State<MainPage> {
     final List<Widget> pages = [
       DashboardPage(
           username: widget.username, saldo: widget.saldo, nim: widget.nim),
-      CicilanPage(username: widget.username),
+      CicilanPage(
+          username: widget.username,
+          saldo: widget.saldo,
+          email: widget.email,
+          nim: widget.nim), // <--- Updated here
       Container(), // Placeholder tengah
       KasPage(username: widget.username),
       EditProfilePage(

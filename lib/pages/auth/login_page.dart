@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart'; // Untuk cek kIsWeb
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'register_page.dart';
-import 'main_page.dart'; // User Biasa
-import 'admin_main_page.dart'; // Admin Biro
-import 'super_admin_dashboard_page.dart'; // Super Admin
+import 'package:minibank/pages/auth/register_page.dart';
+import 'package:minibank/pages/home/main_page.dart'; // User Biasa
+import 'package:minibank/pages/admin/admin_main_page.dart'; // Admin Biro
+import 'package:minibank/pages/admin/super_admin_dashboard_page.dart'; // Super Admin
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

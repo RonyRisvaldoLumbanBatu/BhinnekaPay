@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart'; 
+import 'package:minibank/pages/auth/login_page.dart'; 
 // Pastikan import ini ada
 
 void main() {

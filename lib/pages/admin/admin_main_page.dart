@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'admin_dashboard_page.dart';
+import 'package:minibank/pages/admin/admin_dashboard_page.dart';
 // Nanti kita buat halaman dummy untuk menu lain biar tidak error
 // import 'admin_history_page.dart';
 // import 'admin_users_page.dart';

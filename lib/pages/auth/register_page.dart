@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart';
+import 'package:minibank/pages/auth/login_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
