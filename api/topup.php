@@ -3,6 +3,11 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 include 'koneksi.php';
 
 // Terima Data
@@ -29,6 +34,15 @@ if ($result->num_rows > 0) {
     $update = "UPDATE users SET saldo = '$saldo_baru' WHERE username = '$username'";
 
     if ($connect->query($update) === TRUE) {
+
+        // --- LOG TRANSAKSI (IN) ---
+        $desc = "Top Up Saldo";
+        $stmt_log = $connect->prepare("INSERT INTO transaksi (username, type, amount, description) VALUES (?, 'IN', ?, ?)");
+        $stmt_log->bind_param("sds", $username, $amount, $desc);
+        $stmt_log->execute();
+        $stmt_log->close();
+        // --------------------------
+
         echo json_encode([
             'success' => true,
             'message' => 'Top Up Berhasil',

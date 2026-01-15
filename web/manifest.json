@@ -1,6 +1,6 @@
 {
-    "name": "minibank",
-    "short_name": "minibank",
+    "name": "BhinnekaPay",
+    "short_name": "BhinnekaPay",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

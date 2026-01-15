@@ -95,7 +95,8 @@ class _KasPageState extends State<KasPage> {
         'kas_id': kasId,
         'nim': widget.nim,
         'nama': widget.username,
-        'nominal': nominal.toString()
+        'nominal': nominal.toString(),
+        'username': widget.username, // ADDED: SEND USERNAME FOR LOGGING
       });
 
       final data = jsonDecode(response.body);

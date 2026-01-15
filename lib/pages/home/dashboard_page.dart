@@ -5,7 +5,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart'; // Untuk kIsWeb
 
 import 'package:minibank/pages/transaksi/isi_saldo_page.dart'; // Menu Isi Saldo
-import 'package:minibank/pages/fitur/cicilan_page.dart'; // Menu Cicilan
+// import 'package:minibank/pages/fitur/riwayat_page.dart'; // HAPUS IMPORT INI
+import 'package:minibank/pages/fitur/cicilan_page.dart'; // KEMBALIKAN IMPORT CICILAN
 import 'package:minibank/pages/fitur/kas_page.dart'; // Menu Kas
 import 'package:minibank/pages/fitur/split_bill_list_page.dart'; // Menu Split Bill (List)
 
@@ -30,28 +31,51 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  late String _currentSaldo; // Variabel saldo yang bisa berubah
+  late String _currentSaldo;
+  double _income = 0;
+  double _expense = 0;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _currentSaldo = widget.saldo; // Inisialisasi awal
-    _fetchLatestSaldo(); // Ambil saldo terbaru dari API
+    _currentSaldo = widget.saldo;
+    _refreshData();
   }
 
-  // FUNGSI TARIK SALDO TERBARU
-  Future<void> _fetchLatestSaldo() async {
+  // FUNGSI TARIK DATA TERBARU (Saldo + Pemasukan/Pengeluaran)
+  Future<void> _refreshData() async {
     setState(() => _isLoading = true);
-    // ... (Login saldo tidak berubah)
-
-    // UPDATE: Kita tidak benar-benar fetch saldo disini untuk mempersingkat,
-    // tapi kalau mau, pakai endpoint get_saldo.php
-    // Disini saya hanya simulasi agar UI safe.
-    // Jika ingin real, copas logika fetch saldo dari login_page.dart
-
-    // Anggap saldo sudah paling update dari Login
+    await _fetchLatestSaldo();
+    await _fetchDashboardStats();
     if (mounted) setState(() => _isLoading = false);
+  }
+
+  Future<void> _fetchLatestSaldo() async {
+    // Logic fetch saldo simple (di real app pakai endpoint get_saldo)
+  }
+
+  Future<void> _fetchDashboardStats() async {
+    String baseUrl = kIsWeb
+        ? 'http://localhost/api/get_dashboard.php'
+        : 'http://192.168.18.10/api/get_dashboard.php';
+
+    try {
+      final response = await http
+          .post(Uri.parse(baseUrl), body: {'username': widget.username});
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          setState(() {
+            _income = double.parse(data['pemasukan'].toString());
+            _expense = double.parse(data['pengeluaran'].toString());
+          });
+        }
+      }
+    } catch (e) {
+      print("Error fetch dashboard: $e");
+    }
   }
 
   @override
@@ -65,8 +89,10 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5), // Background Abu Muda
       body: RefreshIndicator(
-        onRefresh: _fetchLatestSaldo,
+        onRefresh: _refreshData,
         child: SingleChildScrollView(
+          physics:
+              const AlwaysScrollableScrollPhysics(), // Biar bisa refresh walau konten sedikit
           child: Column(
             children: [
               // 1. HEADER (Sapaan & Saldo) - STYLE BARU
@@ -95,13 +121,24 @@ class _DashboardPageState extends State<DashboardPage> {
 
               const SizedBox(height: 25),
 
-              // 3. BANNER PROMO (Carousel)
-              _buildPromoBanner(),
-
-              const SizedBox(height: 25),
-
-              // 4. BERITA KAMPUS (Vertical List)
-              _buildNewsSection(),
+              // 3. PEMASUKAN & PENGELUARAN (REAL DATA)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Ringkasan Keuangan",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87),
+                    ),
+                    const SizedBox(height: 15),
+                    _buildFinancialSummary(formatter),
+                  ],
+                ),
+              ),
 
               const SizedBox(height: 30),
             ],
@@ -225,17 +262,20 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // KEMBALIKAN KE CICILAN
           _buildMenuIcon(
               context,
-              Icons.receipt_long,
-              "Cicilan",
+              Icons.receipt_long, // ICON CICILAN
+              "Cicilan", // LABEL CICILAN
               () => Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => CicilanPage(
+                          // NAVIGASI KE CICILAN
                           username: widget.username,
                           saldo: _currentSaldo,
                           nim: widget.nim)))),
+
           _buildMenuIcon(
               context,
               Icons.monetization_on_outlined,
@@ -256,9 +296,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => SplitBillListPage(
-                          // <--- PASSING PARAMETERS HERE
-                          username: widget.username,
-                          nim: widget.nim ?? "-")))),
+                          username: widget.username, nim: widget.nim ?? "-")))),
         ],
       ),
     );
@@ -285,119 +323,68 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildPromoBanner() {
-    return SizedBox(
-      height: 140,
-      child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        scrollDirection: Axis.horizontal,
-        children: [
-          _buildPromoCard(
-              Colors.orange, "Diskon Kantin 50%", "Berlaku hari ini"),
-          _buildPromoCard(
-              Colors.blue, "Bebas Denda", "Bayar Cicilan Tepat Waktu"),
-          _buildPromoCard(Colors.green, "Cashback TopUp", "Via Bank Mini"),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPromoCard(Color color, String title, String subtitle) {
-    return Container(
-      width: 260,
-      margin: const EdgeInsets.only(right: 15),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(colors: [color, color.withOpacity(0.7)])),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                  color: Colors.white24,
-                  borderRadius: BorderRadius.circular(4)),
-              child: const Text("PROMO",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold))),
-          const SizedBox(height: 10),
-          Text(title,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18)),
-          Text(subtitle,
-              style: const TextStyle(color: Colors.white70, fontSize: 12)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNewsSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Berita Kampus",
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87),
-          ),
-          const SizedBox(height: 15),
-          _buildNewsItem("Jadwal UAS Semester Genap", "Akademik • 2 Jam lalu"),
-          _buildNewsItem(
-              "Pendaftaran Beasiswa 2024", "Kemahasiswaan • 5 Jam lalu"),
-          _buildNewsItem(
-              "Workshop Flutter untuk Pemula", "UKM IT • 1 Hari lalu"),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNewsItem(String title, String meta) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 5)
-          ]),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
+  // --- WIDGET BARU: PEMASUKAN DAN PENGELUARAN (DYNAMIC) ---
+  Widget _buildFinancialSummary(NumberFormat formatter) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(8)),
-            child: Icon(Icons.article, color: Colors.grey[400]),
-          ),
-          const SizedBox(width: 15),
-          Expanded(
+              color: const Color(0xFFE8F5E9), // Hijau Muda
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
+                const Row(
+                  children: [
+                    Icon(Icons.arrow_downward, color: Colors.green, size: 20),
+                    SizedBox(width: 8),
+                    Text("Pemasukan",
+                        style: TextStyle(fontSize: 12, color: Colors.black54)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(formatter.format(_income), // REAL DATA
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14)),
-                const SizedBox(height: 4),
-                Text(meta,
-                    style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green)),
               ],
             ),
-          )
-        ],
-      ),
+          ),
+        ),
+        const SizedBox(width: 15),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFEBEE), // Merah Muda
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.arrow_upward, color: Colors.red, size: 20),
+                    SizedBox(width: 8),
+                    Text("Pengeluaran",
+                        style: TextStyle(fontSize: 12, color: Colors.black54)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(formatter.format(_expense), // REAL DATA
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red)),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

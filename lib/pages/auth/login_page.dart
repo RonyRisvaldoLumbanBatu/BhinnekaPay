@@ -109,8 +109,11 @@ class _LoginPageState extends State<LoginPage> {
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white30, width: 2),
                     ),
-                    child: const Icon(Icons.account_balance_wallet_rounded,
-                        size: 48, color: Colors.white),
+                    child: Image.asset(
+                      "assets/logo.png",
+                      width: 60,
+                      height: 60,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -210,34 +213,20 @@ class _LoginPageState extends State<LoginPage> {
                       _buildModernPasswordField(),
 
                       // OPSI TAMBAHAN (Updated: Pakai Wrap biar responsif)
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        alignment: WrapAlignment.spaceBetween,
+                      // OPSI TAMBAHAN (Updated: Pakai Wrap biar responsif)
+                      Row(
                         children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(
-                                value: _rememberMe,
-                                onChanged: (val) =>
-                                    setState(() => _rememberMe = val!),
-                                activeColor: const Color(0xFF1A237E),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(4)),
-                              ),
-                              const Text("Ingat Saya",
-                                  style: TextStyle(
-                                      fontSize: 13, color: Colors.black54)),
-                            ],
+                          Checkbox(
+                            value: _rememberMe,
+                            onChanged: (val) =>
+                                setState(() => _rememberMe = val!),
+                            activeColor: const Color(0xFF1A237E),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4)),
                           ),
-                          TextButton(
-                            onPressed: () {},
-                            child: const Text("Lupa Password?",
-                                style: TextStyle(
-                                    color: Color(0xFF1A237E),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13)),
-                          )
+                          const Text("Ingat Saya",
+                              style: TextStyle(
+                                  fontSize: 13, color: Colors.black54)),
                         ],
                       ),
                       const SizedBox(height: 10),

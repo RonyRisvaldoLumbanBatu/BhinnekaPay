@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:minibank/pages/home/dashboard_page.dart';
 import 'package:minibank/pages/fitur/kas_page.dart';
 import 'package:minibank/pages/profil/edit_profile_page.dart';
-import 'package:minibank/pages/fitur/cicilan_page.dart';
+import 'package:minibank/pages/fitur/riwayat_page.dart'; // GANTI CICILAN KE RIWAYAT
 import 'package:minibank/pages/transaksi/qr_scan_page.dart';
 import 'package:minibank/pages/transaksi/input_nim_page.dart';
 import 'package:minibank/pages/transaksi/request_saldo_page.dart';
@@ -377,18 +377,14 @@ class _MainPageState extends State<MainPage> {
         kelas: widget.kelas, // <-- PASS KELAS
         roleKelas: widget.roleKelas, // <-- PASS ROLE
       ),
-      CicilanPage(
-        username: widget.username,
-        saldo: widget.saldo,
-        email: widget.email,
-        nim: widget.nim,
-      ),
+      // GANTI CICILAN PAGE -> RIWAYAT PAGE (INDEX 1)
+      RiwayatPage(username: widget.username),
       Container(), // Placeholder tengah
       KasPage(
         username: widget.username,
         kelas: widget.kelas,
         roleKelas: widget.roleKelas,
-        nim: widget.nim ?? "-", // <-- PASSING NIM KE KASPAGE
+        nim: widget.nim ?? "-",
       ),
       EditProfilePage(
         username: widget.username,
@@ -419,7 +415,7 @@ class _MainPageState extends State<MainPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildNavItem(Icons.home_filled, "Beranda", 0),
-            _buildNavItem(Icons.receipt_long, "Cicilan", 1),
+            _buildNavItem(Icons.history, "Riwayat", 1), // GANTI LABEL DAN ICON
             const SizedBox(width: 50),
             _buildNavItem(Icons.monetization_on, "Kas", 3),
             _buildNavItem(Icons.person, "Profil", 4),
